@@ -140,7 +140,7 @@ TileSource.prototype.forEachLoadedTile = function(projection, z, tileRange, call
       loaded = false;
       if (tileCache.containsKey(tileCoordKey)) {
         tile = /** @type {!module:ol/Tile~Tile} */ (tileCache.get(tileCoordKey));
-        loaded = tile.getState() === TileState.LOADED;
+        loaded = tile.getState() === TileState.LOADEDs && (this.getKey() == tile.key);
         if (loaded) {
           loaded = (callback(tile) !== false);
         }

@@ -170,7 +170,7 @@ VectorTileSource.prototype.getTile = function(z, x, y, pixelRatio, projection) {
       this.sourceTiles_, pixelRatio, projection, this.tileClass,
       this.handleTileChange.bind(this),
       this.tileOptions);
-
+    tile.key = this.getKey();
     this.tileCache.set(tileCoordKey, tile);
     return tile;
   }

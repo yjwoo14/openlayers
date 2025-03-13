@@ -65,6 +65,12 @@ import PointerInteraction from './Pointer.js';
  */
 
 /**
+ * A function that takes a {@link module:ol/Feature~Feature} and returns `true` if the feature may be
+ * snapped or `false` otherwise.
+ * @typedef {function(import("../Feature.js").default):boolean} FilterFunction
+ */
+
+/**
  * @typedef {Object} Options
  * @property {import("../Collection.js").default<import("../Feature.js").default>} [features] Snap to these features. Either this option or source should be provided.
  * @property {import("../source/Vector.js").default} [source] Snap to features from this source. Either this option or features should be provided
@@ -83,6 +89,7 @@ import PointerInteraction from './Pointer.js';
  *   - `MultiPoint`: One one-dimensional segment for each point.
  *   - `MultiLineString`: One two-dimensional segment for each segment of the linestrings.
  *   - `MultiPolygon`: One two-dimensional segment for each segment of the polygons.
+ * @property {FilterFunction} [filter] Snap to features that this function returns true.
  */
 
 /**
@@ -442,6 +449,12 @@ class Snap extends PointerInteraction {
       GEOMETRY_SEGMENTERS,
       options.segmenters,
     );
+
+    /**
+     * @private
+     * @type {FilterFunction}
+     */
+    this.filter_ = options.filter ? options.filter : TRUE;
   }
 
   /**
@@ -770,7 +783,9 @@ class Snap extends PointerInteraction {
       projection,
     );
 
-    const segments = this.rBush_.getInExtent(box);
+    const segments = this.rBush_
+      .getInExtent(box)
+      .filter((v) => this.filter_(v.feature));
     const segmentsLength = segments.length;
     if (segmentsLength === 0) {
       return null;
@@ -883,6 +898,18 @@ class Snap extends PointerInteraction {
   updateFeature_(feature) {
     this.removeFeature(feature, false);
     this.addFeature(feature, false);
+  }
+
+  /**
+   * Filter for features to snap.
+   * @param {FilterFunction} filter  A function
+   * that takes a {@link module:ol/Feature~Feature} and a
+   * {@link module:ol/layer/Layer~Layer} and returns `true` if the feature may be
+   * selected or `false` otherwise.
+   * @api
+   */
+  setFilter(filter) {
+    this.filter_ = filter ? filter : TRUE;
   }
 }
 

@@ -105,6 +105,14 @@ const ExampleDraw = {
 };
 ExampleDraw.init();
 
+// The snap interaction must be added after the Modify and Draw interactions
+// in order for its map browser event handlers to be fired first. Its handlers
+// are responsible of doing the snapping.
+const snap = new Snap({
+  source: vector.getSource(),
+  intersection: true,
+});
+
 /**
  * Let user change the geometry type.
  * @param {Event} e Change event.
@@ -124,19 +132,19 @@ optionsForm.onchange = function (e) {
       ExampleDraw.setActive(true);
       ExampleModify.setActive(false);
     }
+  } else if (type == 'snap-type') {
+    const type = e.target.value;
+    snap.setFilter((f) => {
+      if (type === 'Any') {
+        return true;
+      }
+      return type === f.getGeometry().getType();
+    });
   }
 };
 
 ExampleDraw.setActive(true);
 ExampleModify.setActive(false);
-
-// The snap interaction must be added after the Modify and Draw interactions
-// in order for its map browser event handlers to be fired first. Its handlers
-// are responsible of doing the snapping.
-const snap = new Snap({
-  source: vector.getSource(),
-  intersection: true,
-});
 
 const snappedElement = document.getElementById('snapped');
 

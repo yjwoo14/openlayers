@@ -546,6 +546,34 @@ describe('ol.interaction.Snap', function () {
 
       snapInteraction.handleEvent(event);
     });
+
+    it('a filter for point only and check if snaps to a point', (done) => {
+      // segment is closer to the event but it should snap to the point.
+      const point = new Feature(new Point([11, 11]));
+      const segment = new Feature(new LineString([[10, 10], [20, 20]]));
+
+      const snapInteraction = new Snap({
+        features: new Collection([point, segment]),
+        pixelTolerance: 5,
+        filter: (f) => f.getGeometry().getType() === "Point",
+      });
+
+      snapInteraction.setMap(map);
+
+      snapInteraction.on('snap', function (snapEvent) {
+        expect(snapEvent.feature).to.be(point);
+        expect(snapEvent.segment).to.be(null);
+        done();
+      });
+
+      const event = {
+        pixel: [10 + width / 2, height / 2 - 10],
+        coordinate: [10, 10],
+        map: map,
+      };
+
+      snapInteraction.handleEvent(event);
+    })
   });
 
   describe('handleEvent - useGeographic', () => {

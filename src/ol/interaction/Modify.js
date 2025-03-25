@@ -1712,6 +1712,14 @@ class Modify extends PointerInteraction {
       },
     );
   }
+
+  /**
+   * @return {Array<DragSegment>} Current drag segments.
+   * @public
+   */
+  getDragSegments() {
+    return this.dragSegments_;
+  }
 }
 
 /**
